@@ -1,46 +1,59 @@
-# CSS-4007 HW5 — Submission Report
+# CSS-4007 HW5 — Submission
 
+**Student:** Ulyana Timofeyeva  
 **Project:** University IT Helpdesk with LangGraph
-**Student:** Ulyana Timofeyeva
-**Python used for report generation:** 3.13.18
 
-## Part 1 — My graph without an LLM
+## Part 1 — Graph without an LLM
 
-**Original graph:**
+I started with a simple graph that checks a user's message and chooses one of three topics: Wi-Fi, password, or other. I used a `HelpdeskState` with `message`, `category`, and `reply`.
+
+At first my graph had these routes:
+
 ```text
-START -> read_request -> [wifi_help | password_help | other_help] -> END
+START → read_request → wifi_help / password_help / other_help → END
 ```
-**Updated graph:**
+
+In S04, the message had both Wi-Fi and password. My code chose Wi-Fi because I checked that word first. Then I added `clarify_problem`, so in S05 the graph asks which issue the user means.
+
 ```text
-START -> read_request -> [wifi_help | password_help | other_help | clarify_problem] -> END
+START → read_request → wifi_help / password_help / other_help / clarify_problem → END
 ```
-I store `message`, `category` and `reply` in `HelpdeskState`. The first node reads the message and returns a category update. The conditional edge reads category and chooses a node. The next node receives the current graph state, not only the previous update. START is the entry point, END stops execution, and compile builds an executable graph.
 
-### My predictions compared with saved traces
+I predicted the paths before testing and compared them with the saved results:
 
-| Scenario | Predicted route | Actual saved route | Match |
+| Scenario | My prediction | Actual route | Result |
 |---|---|---|---|
-| S01 | read_request → wifi_help | read_request → wifi_help | PASS |
-| S02 | read_request → password_help | read_request → password_help | PASS |
-| S03 | read_request → other_help | read_request → other_help | PASS |
-| S04 | read_request → wifi_help | read_request → wifi_help | PASS |
-| S05 | read_request → clarify_problem | read_request → clarify_problem | PASS |
+| S01 | `read_request → wifi_help` | `read_request → wifi_help` | PASS |
+| S02 | `read_request → password_help` | `read_request → password_help` | PASS |
+| S03 | `read_request → other_help` | `read_request → other_help` | PASS |
+| S04 | `read_request → wifi_help` | `read_request → wifi_help` | PASS |
+| S05 | `read_request → clarify_problem` | `read_request → clarify_problem` | PASS |
 
-In S04 both words appear, but my Python code checks Wi-Fi before password. In S05 I changed the routing and added a new clarification node. LangGraph controls the node sequence; Python conditions decide the category. There is no model in Part 1.
+The main thing I learned here is that a node changes the state, while a conditional edge decides which node runs next. I did not use an LLM in this part.
 
-## Part 2 — LLM and three tools
+## Part 2 — LLM and tools
 
-**Execution loop:** `START -> llm -> tools -> llm -> ... -> END`. `tools_condition` checks whether the last AI message requests a tool. The LLM requests it; `ToolNode` executes it. Its result becomes a `ToolMessage` in `MessagesState`, and the model reads the result before continuing. The graph has a `recursion_limit=16` (config in `run_message`).
+Next, I connected an OpenAI model to LangGraph. Instead of choosing a route with `if` conditions, the model can request a tool. `ToolNode` runs that tool and returns the result. The model then continues with that information.
 
-This differs from Part 1 because a real tool-capable model chooses the tool calls. The deterministic offline model is only a clearly labelled test substitute.
+I used these three tools:
 
-- `find_instructions`: reads `data/helpdesk.json`.
-- `check_service_status`: reads the selected snapshot in `data/service_status.json`.
-- `prepare_ticket`: checks user-stated steps and conditional status; saves only a local draft from `data/ticket_template.json`.
+- `find_instructions` reads the Wi-Fi or password guide from `data/helpdesk.json`.
+- `check_service_status` reads the selected service status from `data/service_status.json`.
+- `prepare_ticket` makes a local JSON draft using `data/ticket_template.json`. It does not send anything.
 
-### Measured scenario runs (not examples from SCENARIOS.md)
+The graph works like this:
 
-| ID | Profile | Offline test substitute | Real OpenAI model | Saved logs |
+```text
+START → llm → tools → llm → END
+```
+
+It can go back from `tools` to `llm` when another step is needed. I set `recursion_limit=16` to stop a very long loop.
+
+For S06, the assistant found the instructions, checked that Wi-Fi was working, and made a ticket draft using the steps the user reported. For S07 and S08, it did not make the conditional ticket because Wi-Fi was down or the status was unknown. In S09 it asked for missing details. In S14 it checked account recovery rather than Wi-Fi.
+
+I tested the Python tools with an offline test model, and I also ran the OpenAI model separately. The offline mode is only for repeatable testing, not a real LLM run. The log files below show the recorded results.
+
+| Scenario | Status profile | Offline | OpenAI model | Log files |
 |---|---|---|---|---|
 | S01 | normal | PASS | N/A (Part 1 has no LLM) | `outputs/offline/S01.json`, `outputs/real/S01.json` |
 | S02 | normal | PASS | N/A (Part 1 has no LLM) | `outputs/offline/S02.json`, `outputs/real/S02.json` |
@@ -57,52 +70,47 @@ This differs from Part 1 because a real tool-capable model chooses the tool call
 | S13 | normal | PASS | PASS | `outputs/offline/S13.json`, `outputs/real/S13.json` |
 | S14 | recovery_outage | PASS | PASS | `outputs/offline/S14.json`, `outputs/real/S14.json` |
 
-**Important distinction:** Offline PASS means the Python graph, tools and deterministic fake model passed checks. It does not prove a real LLM selected the tools correctly. The real demonstration is separate and requires OPENAI_API_KEY. Refer to `outputs/real/` for measured LLM tool requests and results; do not claim it ran if there are no files.
+## Part 3 — Memory
 
-S06 uses instructions, status and a local draft. S07 uses `wifi_outage`: a conditional draft must not be created. S08 uses `status_unavailable`: unknown is not operational. S09 asks for missing details before drafting. S14 checks `account_recovery`, not Wi-Fi. Actual behavior is stored in per-event logs, not hard-coded in this report.
+I used SQLite for two different types of memory:
 
-## Part 3 — Persistent conversation and user memory
+- **Conversation memory:** LangGraph `SqliteSaver` keeps earlier messages in a thread.
+- **User memory:** a separate SQLite file saves the user's preferred language using `user_id`.
 
-I use LangGraph `SqliteSaver` in `local-storage/.../conversations.sqlite` for conversation history. The application composes its checkpoint key from `user_id::thread_id`, so even an identical thread name does not cross users. I save the language choice separately in `local-storage/.../preferences.sqlite`, indexed by `user_id`.
+For conversation history, I use both the user ID and thread ID, so two users do not share the same conversation by mistake.
 
-- S10: a later message in the same thread reads the prior conversation.
-- S11: separate Python subprocesses read the same SQLite checkpoint after a genuine restart event.
-- S12: the new thread has no prior conversation messages, but the same user's preference remains.
-- S13: a different user does not inherit the first user's preference or thread history.
+I tested four situations. S10 checked whether the assistant remembered an earlier message in the same conversation. In S11, I ran the next message in a new Python process and checked whether the stored conversation could still be read. S12 used a new thread but the same user, so the Kazakh language preference was remembered. S13 used another user and confirmed that the preference and previous conversation were not shared.
 
-Looking up Wi-Fi instructions is **retrieval** from the reference fixture. Remembering a preferred language is **user memory**. Remembering earlier messages in one thread is **conversation memory**. The trace records the read source.
+I had a problem with S11 at first: the model gave a correct Kazakh answer, but my test searched for an English word. I corrected the check for the Kazakh wording and ran S11 again. It passed.
 
-### Commands for actual restart demonstration
-
-The scenario runner uses `subprocess.run` to launch each turn in a **new Python process**, so a previous CLI process exits before the next turn. It never re-injects the first turn's text into the second turn. Restart events are recorded in `outputs/*/S11.json` and `S12.json`.
+For the restart test I used:
 
 ```bash
-python run_scenarios.py --mode offline --ids S10 S11 S12 S13
-# After setting OPENAI_API_KEY, to repeat with the actual model:
-python run_scenarios.py --mode real --ids S10 S11 S12 S13
+python run_scenarios.py --mode real --ids S11
 ```
 
-## Part 4 — Reproducibility, tests and CI
+The recorded commands and memory information are in `outputs/real/S11.json`. I did not copy the old user message into the new input.
 
-I supply a terminal CLI (`python -m helpdesk_app.cli`), exact dependencies in requirements.txt, offline pytest tests in `tests/`, and `.github/workflows/tests.yml` that runs pytest after a push. Live SQLite files and API keys are ignored by Git.
+## Part 4 — Tests and files
 
-The tests catch wrong Wi-Fi/password routing, bad tool aliases, unknown-status-as-working bugs, invented/missing ticket steps, draft creation during outage, failure to persist conversation state, and leaks of preferences or threads between users. They do not use a real LLM or require an API key.
+I added tests in the `tests/` folder. They check the graph routes, tool results, ticket conditions, saved memory, and separation between users. These tests work without an OpenAI API key.
+
+My final Colab check showed **17 passed** in pytest. The saved scenario checks also showed **S01–S14 PASS**. The real model was used in Parts 2 and 3; Part 1 used Python rules.
+
+To run the project:
 
 ```bash
 python -m pip install -r requirements.txt
 python -m pytest -q
 python run_scenarios.py --mode offline
-python run_scenarios.py --mode real   # requires a key and can incur API charges
+# Real LLM run (requires OPENAI_API_KEY):
+python run_scenarios.py --mode real
 ```
 
-**Storage reset:** Delete `local-storage/` to clear preferences, tickets and checkpoints. The outputs folder contains shareable synthetic traces. Never commit real user credentials or .env files.
+The code is in `helpdesk_app/`, tests are in `tests/`, and the recorded runs are in `outputs/`. I also prepared `.github/workflows/tests.yml` for GitHub Actions. The API key and local SQLite databases should not be uploaded.
 
-## Final check before submission
+## Final result
 
-- [ ] Run pytest successfully in Colab or locally.
-- [ ] Check the offline scenario table and read any FAIL trace.
-- [ ] Run the real LLM examples with API key and inspect `outputs/real`.
-- [ ] Make sure all claimed results match saved logs.
-- [ ] Push code, requirements, tests, workflow, notebook and logs to my public GitHub fork.
-- [ ] Check GitHub Actions for a green test run.
-- [ ] Submit the GitHub link on the LMS.
+I built and tested the helpdesk graph, tools, and memory. All 14 scenarios in my saved results passed, and the 17 pytest tests passed in Colab. The project prepares local ticket drafts only; it does not contact a real university helpdesk.
+
+Before submission, I still need to confirm that the GitHub Actions test run is green and that my final notebook is included in the repository.
