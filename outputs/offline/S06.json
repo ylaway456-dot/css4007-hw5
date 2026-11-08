@@ -1,0 +1,297 @@
+{
+  "scenario": "S06",
+  "title": "Instructions then local ticket",
+  "part": 2,
+  "status_profile": "normal",
+  "mode": "offline_fake_model_NOT_REAL_LLM",
+  "reset_before": true,
+  "launches": [
+    {
+      "event_index": 0,
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "helpdesk_app.cli",
+        "event",
+        "--scenario",
+        "S06",
+        "--index",
+        "0",
+        "--mode",
+        "offline",
+        "--storage-dir",
+        "/content/css4007-hw5-main/local-storage/offline/S06"
+      ],
+      "fresh_python_subprocess": true
+    },
+    {
+      "event_index": 1,
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "helpdesk_app.cli",
+        "event",
+        "--scenario",
+        "S06",
+        "--index",
+        "1",
+        "--mode",
+        "offline",
+        "--storage-dir",
+        "/content/css4007-hw5-main/local-storage/offline/S06"
+      ],
+      "fresh_python_subprocess": true
+    }
+  ],
+  "restart_events": [],
+  "turns": [
+    {
+      "mode": "offline_fake_model_NOT_REAL_LLM",
+      "provider": "deterministic_fake_for_tests",
+      "model": "offline_rules",
+      "status_profile": "normal",
+      "user_id": "demo-user-a",
+      "thread_id": "s06",
+      "message": "Show me the Wi-Fi troubleshooting steps.",
+      "history_messages_before": 0,
+      "checkpoint_thread_key": "demo-user-a::s06",
+      "stored_language_before": null,
+      "stored_language_after": null,
+      "read_sources": [
+        "data/helpdesk.json"
+      ],
+      "visited_nodes": [
+        "llm",
+        "tools",
+        "llm"
+      ],
+      "trace": [
+        {
+          "node": "llm",
+          "updates": [
+            {
+              "tool_request": "find_instructions",
+              "args": {
+                "topic": "wifi"
+              }
+            }
+          ]
+        },
+        {
+          "node": "tools",
+          "updates": [
+            {
+              "tool_result": "find_instructions",
+              "result": {
+                "topic": "wifi",
+                "instruction_id": "GUIDE-WIFI",
+                "title": "Connect to the practice campus network",
+                "steps": [
+                  "Check that Wi-Fi is enabled and airplane mode is off.",
+                  "Select the fictional Campus-Demo network.",
+                  "If connection fails, forget the saved network and try connecting again.",
+                  "If the problem remains, check the service status before preparing a ticket."
+                ],
+                "source": "data/helpdesk.json"
+              }
+            }
+          ]
+        },
+        {
+          "node": "llm",
+          "updates": []
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "find_instructions",
+          "args": {
+            "topic": "wifi"
+          }
+        }
+      ],
+      "tool_results": [
+        {
+          "tool": "find_instructions",
+          "result": {
+            "topic": "wifi",
+            "instruction_id": "GUIDE-WIFI",
+            "title": "Connect to the practice campus network",
+            "steps": [
+              "Check that Wi-Fi is enabled and airplane mode is off.",
+              "Select the fictional Campus-Demo network.",
+              "If connection fails, forget the saved network and try connecting again.",
+              "If the problem remains, check the service status before preparing a ticket."
+            ],
+            "source": "data/helpdesk.json"
+          }
+        }
+      ],
+      "final_answer": "Connect to the practice campus network: Check that Wi-Fi is enabled and airplane mode is off. Select the fictional Campus-Demo network. If connection fails, forget the saved network and try connecting again. If the problem remains, check the service status before preparing a ticket.",
+      "saved_message_count": 4,
+      "loop_limit": 16,
+      "loop_limit_reached": false,
+      "tickets": []
+    },
+    {
+      "mode": "offline_fake_model_NOT_REAL_LLM",
+      "provider": "deterministic_fake_for_tests",
+      "model": "offline_rules",
+      "status_profile": "normal",
+      "user_id": "demo-user-a",
+      "thread_id": "s06",
+      "message": "I enabled Wi-Fi and forgot the saved network, but Campus-Demo still will not connect. Check whether Wi-Fi is down. If it is operating, prepare a ticket about this problem.",
+      "history_messages_before": 4,
+      "checkpoint_thread_key": "demo-user-a::s06",
+      "stored_language_before": null,
+      "stored_language_after": null,
+      "read_sources": [
+        "conversation_checkpoint",
+        "data/service_status.json"
+      ],
+      "visited_nodes": [
+        "llm",
+        "tools",
+        "llm",
+        "tools",
+        "llm"
+      ],
+      "trace": [
+        {
+          "node": "llm",
+          "updates": [
+            {
+              "tool_request": "check_service_status",
+              "args": {
+                "service": "wifi"
+              }
+            }
+          ]
+        },
+        {
+          "node": "tools",
+          "updates": [
+            {
+              "tool_result": "check_service_status",
+              "result": {
+                "service": "wifi",
+                "status_profile": "normal",
+                "status": "operational",
+                "message": "The demo Wi-Fi service has no reported outage.",
+                "source": "data/service_status.json"
+              }
+            }
+          ]
+        },
+        {
+          "node": "llm",
+          "updates": [
+            {
+              "tool_request": "prepare_ticket",
+              "args": {}
+            }
+          ]
+        },
+        {
+          "node": "tools",
+          "updates": [
+            {
+              "tool_result": "prepare_ticket",
+              "result": {
+                "result": "draft_created",
+                "message": "Local draft saved; nothing was sent.",
+                "ticket_id": "DEMO-282d85513e46",
+                "file_path": "/content/css4007-hw5-main/local-storage/offline/S06/tickets/DEMO-282d85513e46.json",
+                "ticket": {
+                  "ticket_id": "DEMO-282d85513e46",
+                  "status": "draft",
+                  "user_id": "demo-user-a",
+                  "thread_id": "s06",
+                  "category": "wifi",
+                  "summary": "I enabled Wi-Fi and forgot the saved network, but Campus-Demo still will not connect. Check whether Wi-Fi is down. If it is operating, prepare a ticket about this problem.",
+                  "steps_tried": [
+                    "Enabled Wi-Fi",
+                    "Forgot the saved network"
+                  ],
+                  "service_status": "operational",
+                  "status_profile": "normal",
+                  "reference_ids": [
+                    "GUIDE-WIFI"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "node": "llm",
+          "updates": []
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "check_service_status",
+          "args": {
+            "service": "wifi"
+          }
+        },
+        {
+          "tool": "prepare_ticket",
+          "args": {}
+        }
+      ],
+      "tool_results": [
+        {
+          "tool": "check_service_status",
+          "result": {
+            "service": "wifi",
+            "status_profile": "normal",
+            "status": "operational",
+            "message": "The demo Wi-Fi service has no reported outage.",
+            "source": "data/service_status.json"
+          }
+        },
+        {
+          "tool": "prepare_ticket",
+          "result": {
+            "result": "draft_created",
+            "message": "Local draft saved; nothing was sent.",
+            "ticket_id": "DEMO-282d85513e46",
+            "file_path": "/content/css4007-hw5-main/local-storage/offline/S06/tickets/DEMO-282d85513e46.json",
+            "ticket": {
+              "ticket_id": "DEMO-282d85513e46",
+              "status": "draft",
+              "user_id": "demo-user-a",
+              "thread_id": "s06",
+              "category": "wifi",
+              "summary": "I enabled Wi-Fi and forgot the saved network, but Campus-Demo still will not connect. Check whether Wi-Fi is down. If it is operating, prepare a ticket about this problem.",
+              "steps_tried": [
+                "Enabled Wi-Fi",
+                "Forgot the saved network"
+              ],
+              "service_status": "operational",
+              "status_profile": "normal",
+              "reference_ids": [
+                "GUIDE-WIFI"
+              ]
+            }
+          }
+        }
+      ],
+      "final_answer": "I saved a local ticket draft at /content/css4007-hw5-main/local-storage/offline/S06/tickets/DEMO-282d85513e46.json. Nothing was sent.",
+      "saved_message_count": 10,
+      "loop_limit": 16,
+      "loop_limit_reached": false,
+      "tickets": [
+        "/content/css4007-hw5-main/local-storage/offline/S06/tickets/DEMO-282d85513e46.json"
+      ]
+    }
+  ],
+  "checks": {
+    "three_tools_used": true,
+    "operational_status": true,
+    "one_or_more_ticket_drafts": true
+  },
+  "passed": true,
+  "note": "Measured run output. Offline mode uses a rule-based substitute, not a real LLM."
+}

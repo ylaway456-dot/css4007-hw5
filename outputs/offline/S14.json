@@ -1,0 +1,115 @@
+{
+  "scenario": "S14",
+  "title": "Password recovery outage",
+  "part": 2,
+  "status_profile": "recovery_outage",
+  "mode": "offline_fake_model_NOT_REAL_LLM",
+  "reset_before": true,
+  "launches": [
+    {
+      "event_index": 0,
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "helpdesk_app.cli",
+        "event",
+        "--scenario",
+        "S14",
+        "--index",
+        "0",
+        "--mode",
+        "offline",
+        "--storage-dir",
+        "/content/css4007-hw5-main/local-storage/offline/S14"
+      ],
+      "fresh_python_subprocess": true
+    }
+  ],
+  "restart_events": [],
+  "turns": [
+    {
+      "mode": "offline_fake_model_NOT_REAL_LLM",
+      "provider": "deterministic_fake_for_tests",
+      "model": "offline_rules",
+      "status_profile": "recovery_outage",
+      "user_id": "demo-user-a",
+      "thread_id": "s14",
+      "message": "My password recovery page is unavailable. Check the service status. Is there a known problem?",
+      "history_messages_before": 0,
+      "checkpoint_thread_key": "demo-user-a::s14",
+      "stored_language_before": null,
+      "stored_language_after": null,
+      "read_sources": [
+        "data/service_status.json"
+      ],
+      "visited_nodes": [
+        "llm",
+        "tools",
+        "llm"
+      ],
+      "trace": [
+        {
+          "node": "llm",
+          "updates": [
+            {
+              "tool_request": "check_service_status",
+              "args": {
+                "service": "account_recovery"
+              }
+            }
+          ]
+        },
+        {
+          "node": "tools",
+          "updates": [
+            {
+              "tool_result": "check_service_status",
+              "result": {
+                "service": "account_recovery",
+                "status_profile": "recovery_outage",
+                "status": "outage",
+                "message": "The demo account-recovery service is unavailable. The fixture gives no repair time.",
+                "source": "data/service_status.json"
+              }
+            }
+          ]
+        },
+        {
+          "node": "llm",
+          "updates": []
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "check_service_status",
+          "args": {
+            "service": "account_recovery"
+          }
+        }
+      ],
+      "tool_results": [
+        {
+          "tool": "check_service_status",
+          "result": {
+            "service": "account_recovery",
+            "status_profile": "recovery_outage",
+            "status": "outage",
+            "message": "The demo account-recovery service is unavailable. The fixture gives no repair time.",
+            "source": "data/service_status.json"
+          }
+        }
+      ],
+      "final_answer": "The fictional account_recovery status is outage. No repair time is provided.",
+      "saved_message_count": 4,
+      "loop_limit": 16,
+      "loop_limit_reached": false,
+      "tickets": []
+    }
+  ],
+  "checks": {
+    "account_recovery_outage": true,
+    "service_status_tool_called": true
+  },
+  "passed": true,
+  "note": "Measured run output. Offline mode uses a rule-based substitute, not a real LLM."
+}

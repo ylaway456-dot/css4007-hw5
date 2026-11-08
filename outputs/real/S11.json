@@ -1,0 +1,229 @@
+{
+  "scenario": "S11",
+  "title": "Persist and recall after restart",
+  "part": 3,
+  "status_profile": "normal",
+  "mode": "real_openai_llm",
+  "reset_before": true,
+  "launches": [
+    {
+      "event_index": 0,
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "helpdesk_app.cli",
+        "event",
+        "--scenario",
+        "S11",
+        "--index",
+        "0",
+        "--mode",
+        "real",
+        "--storage-dir",
+        "/content/css4007-hw5-main/local-storage/real/S11"
+      ],
+      "fresh_python_subprocess": true
+    },
+    {
+      "event_index": 2,
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "helpdesk_app.cli",
+        "event",
+        "--scenario",
+        "S11",
+        "--index",
+        "2",
+        "--mode",
+        "real",
+        "--storage-dir",
+        "/content/css4007-hw5-main/local-storage/real/S11"
+      ],
+      "fresh_python_subprocess": true
+    }
+  ],
+  "restart_events": [
+    {
+      "action": "restart_process",
+      "preserve_local_storage": true,
+      "after_event_index": 0,
+      "description": "Previous CLI subprocess had already exited; next turn launches a fresh one."
+    }
+  ],
+  "turns": [
+    {
+      "mode": "real_openai_llm",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini",
+      "status_profile": "normal",
+      "user_id": "demo-user-a",
+      "thread_id": "restart-a",
+      "message": "Please remember that I prefer replies in Kazakh. My issue is Wi-Fi. I enabled it and tried reconnecting, but it still fails.",
+      "history_messages_before": 0,
+      "checkpoint_thread_key": "demo-user-a::restart-a",
+      "stored_language_before": null,
+      "stored_language_after": "Kazakh",
+      "read_sources": [
+        "data/helpdesk.json",
+        "data/service_status.json"
+      ],
+      "visited_nodes": [
+        "llm",
+        "tools",
+        "llm",
+        "tools",
+        "llm"
+      ],
+      "trace": [
+        {
+          "node": "llm",
+          "updates": [
+            {
+              "tool_request": "check_service_status",
+              "args": {
+                "service": "Wi-Fi"
+              }
+            }
+          ]
+        },
+        {
+          "node": "tools",
+          "updates": [
+            {
+              "tool_result": "check_service_status",
+              "result": {
+                "service": "wifi",
+                "status_profile": "normal",
+                "status": "operational",
+                "message": "The demo Wi-Fi service has no reported outage.",
+                "source": "data/service_status.json"
+              }
+            }
+          ]
+        },
+        {
+          "node": "llm",
+          "updates": [
+            {
+              "tool_request": "find_instructions",
+              "args": {
+                "topic": "Wi-Fi"
+              }
+            }
+          ]
+        },
+        {
+          "node": "tools",
+          "updates": [
+            {
+              "tool_result": "find_instructions",
+              "result": {
+                "topic": "wifi",
+                "instruction_id": "GUIDE-WIFI",
+                "title": "Connect to the practice campus network",
+                "steps": [
+                  "Check that Wi-Fi is enabled and airplane mode is off.",
+                  "Select the fictional Campus-Demo network.",
+                  "If connection fails, forget the saved network and try connecting again.",
+                  "If the problem remains, check the service status before preparing a ticket."
+                ],
+                "source": "data/helpdesk.json"
+              }
+            }
+          ]
+        },
+        {
+          "node": "llm",
+          "updates": []
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "check_service_status",
+          "args": {
+            "service": "Wi-Fi"
+          }
+        },
+        {
+          "tool": "find_instructions",
+          "args": {
+            "topic": "Wi-Fi"
+          }
+        }
+      ],
+      "tool_results": [
+        {
+          "tool": "check_service_status",
+          "result": {
+            "service": "wifi",
+            "status_profile": "normal",
+            "status": "operational",
+            "message": "The demo Wi-Fi service has no reported outage.",
+            "source": "data/service_status.json"
+          }
+        },
+        {
+          "tool": "find_instructions",
+          "result": {
+            "topic": "wifi",
+            "instruction_id": "GUIDE-WIFI",
+            "title": "Connect to the practice campus network",
+            "steps": [
+              "Check that Wi-Fi is enabled and airplane mode is off.",
+              "Select the fictional Campus-Demo network.",
+              "If connection fails, forget the saved network and try connecting again.",
+              "If the problem remains, check the service status before preparing a ticket."
+            ],
+            "source": "data/helpdesk.json"
+          }
+        }
+      ],
+      "final_answer": "Wi-Fi қосылғанын және ұшақ режимінің өшірілгенін тексеріңіз. Содан кейін Campus-Demo желісін таңдаңыз. Егер қосылу сәтсіз болса, сақталған желіні ұмытып, қайта қосылып көріңіз. Егер мәселе шешілмесе, маған хабарлаңыз, әрі қарай көмектесемін. Қызметтің өзі қалыпты жұмыс істеп тұр.",
+      "saved_message_count": 6,
+      "loop_limit": 16,
+      "loop_limit_reached": false,
+      "tickets": []
+    },
+    {
+      "mode": "real_openai_llm",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini",
+      "status_profile": "normal",
+      "user_id": "demo-user-a",
+      "thread_id": "restart-a",
+      "message": "Which problem and steps did we discuss?",
+      "history_messages_before": 6,
+      "checkpoint_thread_key": "demo-user-a::restart-a",
+      "stored_language_before": "Kazakh",
+      "stored_language_after": "Kazakh",
+      "read_sources": [
+        "conversation_checkpoint",
+        "user_preference_memory"
+      ],
+      "visited_nodes": [
+        "llm"
+      ],
+      "trace": [
+        {
+          "node": "llm",
+          "updates": []
+        }
+      ],
+      "tool_calls": [],
+      "tool_results": [],
+      "final_answer": "Сіз Wi-Fi мәселесін айттыңыз. Қолданған қадамдарыңыз: Wi-Fi-ды қосу және қайта қосылуға тырысу.",
+      "saved_message_count": 8,
+      "loop_limit": 16,
+      "loop_limit_reached": false,
+      "tickets": []
+    }
+  ],
+  "checks": {
+    "thread_recovered_after_restart": true,
+    "preference_stored": true,
+    "steps_recalled_without_invented_advice": true
+  },
+  "passed": true,
+  "note": "Measured run output. Offline mode uses a rule-based substitute, not a real LLM."
+}

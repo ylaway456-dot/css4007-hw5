@@ -1,0 +1,78 @@
+{
+  "scenario": "S02",
+  "title": "Case-insensitive password route",
+  "part": 1,
+  "status_profile": "normal",
+  "mode": "python_rules_without_llm",
+  "reset_before": true,
+  "launches": [
+    {
+      "event_index": 0,
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "helpdesk_app.cli",
+        "part1",
+        "--scenario",
+        "S02"
+      ],
+      "fresh_python_subprocess": true
+    }
+  ],
+  "restart_events": [],
+  "turns": [
+    {
+      "scenario": "S02",
+      "mode": "python_rules_without_llm",
+      "variant": "original",
+      "message": "I forgot my PASSWORD.",
+      "predicted_route": [
+        "read_request",
+        "password_help"
+      ],
+      "actual_route": [
+        "read_request",
+        "password_help"
+      ],
+      "match": true,
+      "trace": [
+        {
+          "node": "read_request",
+          "update": {
+            "category": "password"
+          },
+          "state_after": {
+            "message": "I forgot my PASSWORD.",
+            "category": "password",
+            "reply": ""
+          }
+        },
+        {
+          "node": "password_help",
+          "update": {
+            "reply": "Recover access to the practice account\nOpen the practice sign-in screen and choose Forgot password.\nFollow the recovery instructions shown by the practice application.\nIf recovery is unavailable, prepare a ticket describing the error.\nNever include a password or recovery code in a ticket."
+          },
+          "state_after": {
+            "message": "I forgot my PASSWORD.",
+            "category": "password",
+            "reply": "Recover access to the practice account\nOpen the practice sign-in screen and choose Forgot password.\nFollow the recovery instructions shown by the practice application.\nIf recovery is unavailable, prepare a ticket describing the error.\nNever include a password or recovery code in a ticket."
+          }
+        }
+      ],
+      "final_answer": "Recover access to the practice account\nOpen the practice sign-in screen and choose Forgot password.\nFollow the recovery instructions shown by the practice application.\nIf recovery is unavailable, prepare a ticket describing the error.\nNever include a password or recovery code in a ticket.",
+      "final_state": {
+        "message": "I forgot my PASSWORD.",
+        "category": "password",
+        "reply": "Recover access to the practice account\nOpen the practice sign-in screen and choose Forgot password.\nFollow the recovery instructions shown by the practice application.\nIf recovery is unavailable, prepare a ticket describing the error.\nNever include a password or recovery code in a ticket."
+      },
+      "sources": [
+        "data/helpdesk.json"
+      ]
+    }
+  ],
+  "checks": {
+    "route_matches_prediction": true
+  },
+  "passed": true,
+  "note": "Measured run output. Offline mode uses a rule-based substitute, not a real LLM."
+}

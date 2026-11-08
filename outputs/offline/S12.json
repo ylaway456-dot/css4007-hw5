@@ -1,0 +1,182 @@
+{
+  "scenario": "S12",
+  "title": "Preference across threads without replay",
+  "part": 3,
+  "status_profile": "normal",
+  "mode": "offline_fake_model_NOT_REAL_LLM",
+  "reset_before": true,
+  "launches": [
+    {
+      "event_index": 0,
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "helpdesk_app.cli",
+        "event",
+        "--scenario",
+        "S12",
+        "--index",
+        "0",
+        "--mode",
+        "offline",
+        "--storage-dir",
+        "/content/css4007-hw5-main/local-storage/offline/S12"
+      ],
+      "fresh_python_subprocess": true
+    },
+    {
+      "event_index": 2,
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "helpdesk_app.cli",
+        "event",
+        "--scenario",
+        "S12",
+        "--index",
+        "2",
+        "--mode",
+        "offline",
+        "--storage-dir",
+        "/content/css4007-hw5-main/local-storage/offline/S12"
+      ],
+      "fresh_python_subprocess": true
+    }
+  ],
+  "restart_events": [
+    {
+      "action": "restart_process",
+      "preserve_local_storage": true,
+      "after_event_index": 0,
+      "description": "Previous CLI subprocess had already exited; next turn launches a fresh one."
+    }
+  ],
+  "turns": [
+    {
+      "mode": "offline_fake_model_NOT_REAL_LLM",
+      "provider": "deterministic_fake_for_tests",
+      "model": "offline_rules",
+      "status_profile": "normal",
+      "user_id": "demo-user-a",
+      "thread_id": "preference-a1",
+      "message": "Please remember that I prefer replies in Kazakh. I have a Wi-Fi problem.",
+      "history_messages_before": 0,
+      "checkpoint_thread_key": "demo-user-a::preference-a1",
+      "stored_language_before": null,
+      "stored_language_after": "Kazakh",
+      "read_sources": [
+        "data/helpdesk.json"
+      ],
+      "visited_nodes": [
+        "llm",
+        "tools",
+        "llm"
+      ],
+      "trace": [
+        {
+          "node": "llm",
+          "updates": [
+            {
+              "tool_request": "find_instructions",
+              "args": {
+                "topic": "wifi"
+              }
+            }
+          ]
+        },
+        {
+          "node": "tools",
+          "updates": [
+            {
+              "tool_result": "find_instructions",
+              "result": {
+                "topic": "wifi",
+                "instruction_id": "GUIDE-WIFI",
+                "title": "Connect to the practice campus network",
+                "steps": [
+                  "Check that Wi-Fi is enabled and airplane mode is off.",
+                  "Select the fictional Campus-Demo network.",
+                  "If connection fails, forget the saved network and try connecting again.",
+                  "If the problem remains, check the service status before preparing a ticket."
+                ],
+                "source": "data/helpdesk.json"
+              }
+            }
+          ]
+        },
+        {
+          "node": "llm",
+          "updates": []
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "find_instructions",
+          "args": {
+            "topic": "wifi"
+          }
+        }
+      ],
+      "tool_results": [
+        {
+          "tool": "find_instructions",
+          "result": {
+            "topic": "wifi",
+            "instruction_id": "GUIDE-WIFI",
+            "title": "Connect to the practice campus network",
+            "steps": [
+              "Check that Wi-Fi is enabled and airplane mode is off.",
+              "Select the fictional Campus-Demo network.",
+              "If connection fails, forget the saved network and try connecting again.",
+              "If the problem remains, check the service status before preparing a ticket."
+            ],
+            "source": "data/helpdesk.json"
+          }
+        }
+      ],
+      "final_answer": "Қазақ тіліндегі жауап қалауыңыз сақталды. Сұрағыңызды алдым.",
+      "saved_message_count": 4,
+      "loop_limit": 16,
+      "loop_limit_reached": false,
+      "tickets": []
+    },
+    {
+      "mode": "offline_fake_model_NOT_REAL_LLM",
+      "provider": "deterministic_fake_for_tests",
+      "model": "offline_rules",
+      "status_profile": "normal",
+      "user_id": "demo-user-a",
+      "thread_id": "preference-a2",
+      "message": "Which language did I ask you to use? What can you help with?",
+      "history_messages_before": 0,
+      "checkpoint_thread_key": "demo-user-a::preference-a2",
+      "stored_language_before": "Kazakh",
+      "stored_language_after": "Kazakh",
+      "read_sources": [
+        "user_preference_memory"
+      ],
+      "visited_nodes": [
+        "llm"
+      ],
+      "trace": [
+        {
+          "node": "llm",
+          "updates": []
+        }
+      ],
+      "tool_calls": [],
+      "tool_results": [],
+      "final_answer": "Сіз жауаптарды қазақ тілінде алуды сұрадыңыз. Мен Wi-Fi және құпиясөз бойынша көмектесе аламын.",
+      "saved_message_count": 2,
+      "loop_limit": 16,
+      "loop_limit_reached": false,
+      "tickets": []
+    }
+  ],
+  "checks": {
+    "separate_new_thread": true,
+    "preference_survives_restart": true
+  },
+  "passed": true,
+  "note": "Measured run output. Offline mode uses a rule-based substitute, not a real LLM."
+}

@@ -1,0 +1,78 @@
+{
+  "scenario": "S01",
+  "title": "Simple Wi-Fi route",
+  "part": 1,
+  "status_profile": "normal",
+  "mode": "python_rules_without_llm",
+  "reset_before": true,
+  "launches": [
+    {
+      "event_index": 0,
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "helpdesk_app.cli",
+        "part1",
+        "--scenario",
+        "S01"
+      ],
+      "fresh_python_subprocess": true
+    }
+  ],
+  "restart_events": [],
+  "turns": [
+    {
+      "scenario": "S01",
+      "mode": "python_rules_without_llm",
+      "variant": "original",
+      "message": "I cannot connect to Wi-Fi.",
+      "predicted_route": [
+        "read_request",
+        "wifi_help"
+      ],
+      "actual_route": [
+        "read_request",
+        "wifi_help"
+      ],
+      "match": true,
+      "trace": [
+        {
+          "node": "read_request",
+          "update": {
+            "category": "wifi"
+          },
+          "state_after": {
+            "message": "I cannot connect to Wi-Fi.",
+            "category": "wifi",
+            "reply": ""
+          }
+        },
+        {
+          "node": "wifi_help",
+          "update": {
+            "reply": "Connect to the practice campus network\nCheck that Wi-Fi is enabled and airplane mode is off.\nSelect the fictional Campus-Demo network.\nIf connection fails, forget the saved network and try connecting again.\nIf the problem remains, check the service status before preparing a ticket."
+          },
+          "state_after": {
+            "message": "I cannot connect to Wi-Fi.",
+            "category": "wifi",
+            "reply": "Connect to the practice campus network\nCheck that Wi-Fi is enabled and airplane mode is off.\nSelect the fictional Campus-Demo network.\nIf connection fails, forget the saved network and try connecting again.\nIf the problem remains, check the service status before preparing a ticket."
+          }
+        }
+      ],
+      "final_answer": "Connect to the practice campus network\nCheck that Wi-Fi is enabled and airplane mode is off.\nSelect the fictional Campus-Demo network.\nIf connection fails, forget the saved network and try connecting again.\nIf the problem remains, check the service status before preparing a ticket.",
+      "final_state": {
+        "message": "I cannot connect to Wi-Fi.",
+        "category": "wifi",
+        "reply": "Connect to the practice campus network\nCheck that Wi-Fi is enabled and airplane mode is off.\nSelect the fictional Campus-Demo network.\nIf connection fails, forget the saved network and try connecting again.\nIf the problem remains, check the service status before preparing a ticket."
+      },
+      "sources": [
+        "data/helpdesk.json"
+      ]
+    }
+  ],
+  "checks": {
+    "route_matches_prediction": true
+  },
+  "passed": true,
+  "note": "Measured run output. Offline mode uses a rule-based substitute, not a real LLM."
+}

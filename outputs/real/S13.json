@@ -1,0 +1,218 @@
+{
+  "scenario": "S13",
+  "title": "Do not share memory between users",
+  "part": 3,
+  "status_profile": "normal",
+  "mode": "real_openai_llm",
+  "reset_before": true,
+  "launches": [
+    {
+      "event_index": 0,
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "helpdesk_app.cli",
+        "event",
+        "--scenario",
+        "S13",
+        "--index",
+        "0",
+        "--mode",
+        "real",
+        "--storage-dir",
+        "/content/css4007-hw5-main/local-storage/real/S13"
+      ],
+      "fresh_python_subprocess": true
+    },
+    {
+      "event_index": 1,
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "helpdesk_app.cli",
+        "event",
+        "--scenario",
+        "S13",
+        "--index",
+        "1",
+        "--mode",
+        "real",
+        "--storage-dir",
+        "/content/css4007-hw5-main/local-storage/real/S13"
+      ],
+      "fresh_python_subprocess": true
+    }
+  ],
+  "restart_events": [],
+  "turns": [
+    {
+      "mode": "real_openai_llm",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini",
+      "status_profile": "normal",
+      "user_id": "demo-user-a",
+      "thread_id": "isolation-a",
+      "message": "Please remember that I prefer replies in Kazakh. I have a Wi-Fi problem.",
+      "history_messages_before": 0,
+      "checkpoint_thread_key": "demo-user-a::isolation-a",
+      "stored_language_before": null,
+      "stored_language_after": "Kazakh",
+      "read_sources": [
+        "data/helpdesk.json",
+        "data/service_status.json"
+      ],
+      "visited_nodes": [
+        "llm",
+        "tools",
+        "llm",
+        "tools",
+        "llm"
+      ],
+      "trace": [
+        {
+          "node": "llm",
+          "updates": [
+            {
+              "tool_request": "check_service_status",
+              "args": {
+                "service": "Wi-Fi"
+              }
+            }
+          ]
+        },
+        {
+          "node": "tools",
+          "updates": [
+            {
+              "tool_result": "check_service_status",
+              "result": {
+                "service": "wifi",
+                "status_profile": "normal",
+                "status": "operational",
+                "message": "The demo Wi-Fi service has no reported outage.",
+                "source": "data/service_status.json"
+              }
+            }
+          ]
+        },
+        {
+          "node": "llm",
+          "updates": [
+            {
+              "tool_request": "find_instructions",
+              "args": {
+                "topic": "Wi-Fi"
+              }
+            }
+          ]
+        },
+        {
+          "node": "tools",
+          "updates": [
+            {
+              "tool_result": "find_instructions",
+              "result": {
+                "topic": "wifi",
+                "instruction_id": "GUIDE-WIFI",
+                "title": "Connect to the practice campus network",
+                "steps": [
+                  "Check that Wi-Fi is enabled and airplane mode is off.",
+                  "Select the fictional Campus-Demo network.",
+                  "If connection fails, forget the saved network and try connecting again.",
+                  "If the problem remains, check the service status before preparing a ticket."
+                ],
+                "source": "data/helpdesk.json"
+              }
+            }
+          ]
+        },
+        {
+          "node": "llm",
+          "updates": []
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "check_service_status",
+          "args": {
+            "service": "Wi-Fi"
+          }
+        },
+        {
+          "tool": "find_instructions",
+          "args": {
+            "topic": "Wi-Fi"
+          }
+        }
+      ],
+      "tool_results": [
+        {
+          "tool": "check_service_status",
+          "result": {
+            "service": "wifi",
+            "status_profile": "normal",
+            "status": "operational",
+            "message": "The demo Wi-Fi service has no reported outage.",
+            "source": "data/service_status.json"
+          }
+        },
+        {
+          "tool": "find_instructions",
+          "result": {
+            "topic": "wifi",
+            "instruction_id": "GUIDE-WIFI",
+            "title": "Connect to the practice campus network",
+            "steps": [
+              "Check that Wi-Fi is enabled and airplane mode is off.",
+              "Select the fictional Campus-Demo network.",
+              "If connection fails, forget the saved network and try connecting again.",
+              "If the problem remains, check the service status before preparing a ticket."
+            ],
+            "source": "data/helpdesk.json"
+          }
+        }
+      ],
+      "final_answer": "Wi-Fi мәселесін шешу үшін келесі қадамдарды орындаңыз:\n1. Wi-Fi қосулы және ұшақ режимі өшірілгенін тексеріңіз.\n2. \"Campus-Demo\" желісін таңдаңыз.\n3. Егер қосылу сәтсіз болса, сақталған желіні ұмытып, қайта қосылып көріңіз.\n4. Егер мәселе шешілмесе, тағы да хабарласыңыз.\n\nҚажет болса, қосымша көмек көрсетемін.",
+      "saved_message_count": 6,
+      "loop_limit": 16,
+      "loop_limit_reached": false,
+      "tickets": []
+    },
+    {
+      "mode": "real_openai_llm",
+      "provider": "OpenAI",
+      "model": "gpt-4.1-mini",
+      "status_profile": "normal",
+      "user_id": "demo-user-b",
+      "thread_id": "isolation-b",
+      "message": "Have I told you a preferred language or a previous problem?",
+      "history_messages_before": 0,
+      "checkpoint_thread_key": "demo-user-b::isolation-b",
+      "stored_language_before": null,
+      "stored_language_after": null,
+      "read_sources": [],
+      "visited_nodes": [
+        "llm"
+      ],
+      "trace": [
+        {
+          "node": "llm",
+          "updates": []
+        }
+      ],
+      "tool_calls": [],
+      "tool_results": [],
+      "final_answer": "You have not told me a preferred language or mentioned any previous problem yet. How can I assist you today?",
+      "saved_message_count": 2,
+      "loop_limit": 16,
+      "loop_limit_reached": false,
+      "tickets": []
+    }
+  ],
+  "checks": {
+    "other_user_has_no_preference": true,
+    "other_user_has_no_history": true
+  },
+  "passed": true,
+  "note": "Measured run output. Offline mode uses a rule-based substitute, not a real LLM."
+}

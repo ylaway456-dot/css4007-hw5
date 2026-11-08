@@ -1,0 +1,78 @@
+{
+  "scenario": "S03",
+  "title": "Unsupported request",
+  "part": 1,
+  "status_profile": "normal",
+  "mode": "python_rules_without_llm",
+  "reset_before": true,
+  "launches": [
+    {
+      "event_index": 0,
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "helpdesk_app.cli",
+        "part1",
+        "--scenario",
+        "S03"
+      ],
+      "fresh_python_subprocess": true
+    }
+  ],
+  "restart_events": [],
+  "turns": [
+    {
+      "scenario": "S03",
+      "mode": "python_rules_without_llm",
+      "variant": "original",
+      "message": "My laptop screen is broken.",
+      "predicted_route": [
+        "read_request",
+        "other_help"
+      ],
+      "actual_route": [
+        "read_request",
+        "other_help"
+      ],
+      "match": true,
+      "trace": [
+        {
+          "node": "read_request",
+          "update": {
+            "category": "other"
+          },
+          "state_after": {
+            "message": "My laptop screen is broken.",
+            "category": "other",
+            "reply": ""
+          }
+        },
+        {
+          "node": "other_help",
+          "update": {
+            "reply": "Is your problem about Wi-Fi or a password?"
+          },
+          "state_after": {
+            "message": "My laptop screen is broken.",
+            "category": "other",
+            "reply": "Is your problem about Wi-Fi or a password?"
+          }
+        }
+      ],
+      "final_answer": "Is your problem about Wi-Fi or a password?",
+      "final_state": {
+        "message": "My laptop screen is broken.",
+        "category": "other",
+        "reply": "Is your problem about Wi-Fi or a password?"
+      },
+      "sources": [
+        "data/helpdesk.json"
+      ]
+    }
+  ],
+  "checks": {
+    "route_matches_prediction": true
+  },
+  "passed": true,
+  "note": "Measured run output. Offline mode uses a rule-based substitute, not a real LLM."
+}

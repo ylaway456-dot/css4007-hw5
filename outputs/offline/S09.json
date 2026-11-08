@@ -1,0 +1,190 @@
+{
+  "scenario": "S09",
+  "title": "Missing ticket details",
+  "part": 2,
+  "status_profile": "normal",
+  "mode": "offline_fake_model_NOT_REAL_LLM",
+  "reset_before": true,
+  "launches": [
+    {
+      "event_index": 0,
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "helpdesk_app.cli",
+        "event",
+        "--scenario",
+        "S09",
+        "--index",
+        "0",
+        "--mode",
+        "offline",
+        "--storage-dir",
+        "/content/css4007-hw5-main/local-storage/offline/S09"
+      ],
+      "fresh_python_subprocess": true
+    },
+    {
+      "event_index": 1,
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "helpdesk_app.cli",
+        "event",
+        "--scenario",
+        "S09",
+        "--index",
+        "1",
+        "--mode",
+        "offline",
+        "--storage-dir",
+        "/content/css4007-hw5-main/local-storage/offline/S09"
+      ],
+      "fresh_python_subprocess": true
+    }
+  ],
+  "restart_events": [],
+  "turns": [
+    {
+      "mode": "offline_fake_model_NOT_REAL_LLM",
+      "provider": "deterministic_fake_for_tests",
+      "model": "offline_rules",
+      "status_profile": "normal",
+      "user_id": "demo-user-a",
+      "thread_id": "s09",
+      "message": "Prepare a support ticket.",
+      "history_messages_before": 0,
+      "checkpoint_thread_key": "demo-user-a::s09",
+      "stored_language_before": null,
+      "stored_language_after": null,
+      "read_sources": [],
+      "visited_nodes": [
+        "llm"
+      ],
+      "trace": [
+        {
+          "node": "llm",
+          "updates": []
+        }
+      ],
+      "tool_calls": [],
+      "tool_results": [],
+      "final_answer": "What problem are you having, and what have you already tried?",
+      "saved_message_count": 2,
+      "loop_limit": 16,
+      "loop_limit_reached": false,
+      "tickets": []
+    },
+    {
+      "mode": "offline_fake_model_NOT_REAL_LLM",
+      "provider": "deterministic_fake_for_tests",
+      "model": "offline_rules",
+      "status_profile": "normal",
+      "user_id": "demo-user-a",
+      "thread_id": "s09",
+      "message": "The issue is Wi-Fi. I enabled it and tried reconnecting, but it still fails.",
+      "history_messages_before": 2,
+      "checkpoint_thread_key": "demo-user-a::s09",
+      "stored_language_before": null,
+      "stored_language_after": null,
+      "read_sources": [
+        "conversation_checkpoint"
+      ],
+      "visited_nodes": [
+        "llm",
+        "tools",
+        "llm"
+      ],
+      "trace": [
+        {
+          "node": "llm",
+          "updates": [
+            {
+              "tool_request": "prepare_ticket",
+              "args": {}
+            }
+          ]
+        },
+        {
+          "node": "tools",
+          "updates": [
+            {
+              "tool_result": "prepare_ticket",
+              "result": {
+                "result": "draft_created",
+                "message": "Local draft saved; nothing was sent.",
+                "ticket_id": "DEMO-3cf6cea14669",
+                "file_path": "/content/css4007-hw5-main/local-storage/offline/S09/tickets/DEMO-3cf6cea14669.json",
+                "ticket": {
+                  "ticket_id": "DEMO-3cf6cea14669",
+                  "status": "draft",
+                  "user_id": "demo-user-a",
+                  "thread_id": "s09",
+                  "category": "wifi",
+                  "summary": "The issue is Wi-Fi. I enabled it and tried reconnecting, but it still fails.",
+                  "steps_tried": [
+                    "Enabled Wi-Fi",
+                    "Tried reconnecting"
+                  ],
+                  "service_status": "not_checked",
+                  "status_profile": "normal",
+                  "reference_ids": []
+                }
+              }
+            }
+          ]
+        },
+        {
+          "node": "llm",
+          "updates": []
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "prepare_ticket",
+          "args": {}
+        }
+      ],
+      "tool_results": [
+        {
+          "tool": "prepare_ticket",
+          "result": {
+            "result": "draft_created",
+            "message": "Local draft saved; nothing was sent.",
+            "ticket_id": "DEMO-3cf6cea14669",
+            "file_path": "/content/css4007-hw5-main/local-storage/offline/S09/tickets/DEMO-3cf6cea14669.json",
+            "ticket": {
+              "ticket_id": "DEMO-3cf6cea14669",
+              "status": "draft",
+              "user_id": "demo-user-a",
+              "thread_id": "s09",
+              "category": "wifi",
+              "summary": "The issue is Wi-Fi. I enabled it and tried reconnecting, but it still fails.",
+              "steps_tried": [
+                "Enabled Wi-Fi",
+                "Tried reconnecting"
+              ],
+              "service_status": "not_checked",
+              "status_profile": "normal",
+              "reference_ids": []
+            }
+          }
+        }
+      ],
+      "final_answer": "I saved a local ticket draft at /content/css4007-hw5-main/local-storage/offline/S09/tickets/DEMO-3cf6cea14669.json. Nothing was sent.",
+      "saved_message_count": 6,
+      "loop_limit": 16,
+      "loop_limit_reached": false,
+      "tickets": [
+        "/content/css4007-hw5-main/local-storage/offline/S09/tickets/DEMO-3cf6cea14669.json"
+      ]
+    }
+  ],
+  "checks": {
+    "first_turn_no_ticket": true,
+    "second_turn_ticket": true,
+    "prior_history_read": true
+  },
+  "passed": true,
+  "note": "Measured run output. Offline mode uses a rule-based substitute, not a real LLM."
+}

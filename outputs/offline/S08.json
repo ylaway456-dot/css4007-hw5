@@ -1,0 +1,115 @@
+{
+  "scenario": "S08",
+  "title": "Status source unavailable",
+  "part": 2,
+  "status_profile": "status_unavailable",
+  "mode": "offline_fake_model_NOT_REAL_LLM",
+  "reset_before": true,
+  "launches": [
+    {
+      "event_index": 0,
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "helpdesk_app.cli",
+        "event",
+        "--scenario",
+        "S08",
+        "--index",
+        "0",
+        "--mode",
+        "offline",
+        "--storage-dir",
+        "/content/css4007-hw5-main/local-storage/offline/S08"
+      ],
+      "fresh_python_subprocess": true
+    }
+  ],
+  "restart_events": [],
+  "turns": [
+    {
+      "mode": "offline_fake_model_NOT_REAL_LLM",
+      "provider": "deterministic_fake_for_tests",
+      "model": "offline_rules",
+      "status_profile": "status_unavailable",
+      "user_id": "demo-user-a",
+      "thread_id": "s08",
+      "message": "Check whether Wi-Fi is down. If it is operating, prepare a ticket. I already enabled Wi-Fi and reconnected, with no success.",
+      "history_messages_before": 0,
+      "checkpoint_thread_key": "demo-user-a::s08",
+      "stored_language_before": null,
+      "stored_language_after": null,
+      "read_sources": [
+        "data/service_status.json"
+      ],
+      "visited_nodes": [
+        "llm",
+        "tools",
+        "llm"
+      ],
+      "trace": [
+        {
+          "node": "llm",
+          "updates": [
+            {
+              "tool_request": "check_service_status",
+              "args": {
+                "service": "wifi"
+              }
+            }
+          ]
+        },
+        {
+          "node": "tools",
+          "updates": [
+            {
+              "tool_result": "check_service_status",
+              "result": {
+                "service": "wifi",
+                "status_profile": "status_unavailable",
+                "status": "unknown",
+                "message": "The demo Wi-Fi status source is unavailable.",
+                "source": "data/service_status.json"
+              }
+            }
+          ]
+        },
+        {
+          "node": "llm",
+          "updates": []
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "check_service_status",
+          "args": {
+            "service": "wifi"
+          }
+        }
+      ],
+      "tool_results": [
+        {
+          "tool": "check_service_status",
+          "result": {
+            "service": "wifi",
+            "status_profile": "status_unavailable",
+            "status": "unknown",
+            "message": "The demo Wi-Fi status source is unavailable.",
+            "source": "data/service_status.json"
+          }
+        }
+      ],
+      "final_answer": "The service status is unknown, not operational. I did not create the conditional ticket. Would you like a draft describing this?",
+      "saved_message_count": 4,
+      "loop_limit": 16,
+      "loop_limit_reached": false,
+      "tickets": []
+    }
+  ],
+  "checks": {
+    "wifi_unknown": true,
+    "no_conditional_ticket": true
+  },
+  "passed": true,
+  "note": "Measured run output. Offline mode uses a rule-based substitute, not a real LLM."
+}
