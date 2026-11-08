@@ -1,5 +1,12 @@
-# Save your own results here
 
-Commit small text or JSON logs for the supplied scenarios. Start each log with its scenario identifier and record the command, snapshot, user and thread. Include your actual node/tool trace and final reply. Keep local ticket drafts here if they contain only invented demo data. Store live memory under the ignored local-storage directory.
+   # Saved Results
 
-This starter contains no completed runs. Do not present the illustrative conversations from SCENARIOS.md as results from your code.
+   This folder contains my results for S01-S14.
+
+   The `offline` folder contains tests with a fake model.
+   The `real` folder contains runs with OpenAI for
+   Parts 2 and 3.
+
+   I saved the actual routes, tool calls, tool results
+   and final answers.
+   
