@@ -2,7 +2,6 @@
 
 **Author:** Ulyana Timofeyeva  
 **Course:** CSS-4007 Artificial Intelligence  
-**Environment:** Python 3.11+ (the included CI uses Python 3.11). Designed for Google Colab too.
 
 ## What I built
 
@@ -77,3 +76,15 @@ Tests check original/updated routes, tools, ticket policy, SQLite persistence af
 ## GitHub submission
 
 Keep the fork public and push all `.py`, `.md`, `.json` fixtures, `requirements.txt`, `.github/workflows/tests.yml`, notebook and small synthetic `outputs/` traces. Do **not** upload `.env`, API keys, `local-storage/`, or SQLite DBs. Confirm CI is green and submit the fork URL in the course LMS.
+
+
+## My Results
+
+I tested my project in Google Colab.
+
+- All 14 scenarios passed.
+- All 17 pytest tests passed.
+- I tested the assistant with the real OpenAI model.
+- I also checked GitHub Actions, and the tests passed there.
+
+During testing, I had a problem with S11. The model answered correctly in Kazakh, but my test did not recognize one Kazakh word. I updated the test and checked S11 again. After that, it passed.
