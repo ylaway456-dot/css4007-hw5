@@ -2,6 +2,9 @@
 
 **Author:** Ulyana Timofeyeva  
 **Course:** CSS-4007 Artificial Intelligence  
+**Python used in Colab:** 3.13.18
+**Python used in GitHub Actions:** 3.11
+   
 
 ## What I built
 
